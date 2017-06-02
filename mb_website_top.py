@@ -3,8 +3,9 @@
 import json
 import fileinput
 import re
+import sys
 from collections import defaultdict, Counter, OrderedDict
-
+from time import time
 
 if __name__ == '__main__':
     pat = re.compile(r'\S+ '
@@ -36,6 +37,9 @@ if __name__ == '__main__':
     def constant_factory(value):
         return lambda: value
 
+    def eprint(*args, **kwargs):
+        print(*args, file=sys.stderr, **kwargs)
+
     top = defaultdict(constant_factory(20))
     top['req'] = 50
     top['sitemap'] = 10
@@ -45,12 +49,22 @@ if __name__ == '__main__':
     for key in count_keys:
         counts[key] = defaultdict(int)
 
+    start_time = time()
+    parsed_lines = 0
+    matched_lines = 0
+    skipped_lines = 0
+    dot_every = 100000
     with fileinput.input() as f:
         for line in f:
+            parsed_lines += 1
+            if parsed_lines % dot_every == 0:
+                eprint(parsed_lines)
             res = re.search(pat, line)
             if res:
+                matched_lines += 1
                 elements = res.groupdict()
                 if re.search(skipreq, elements['req']):
+                    skipped_lines += 1
                     continue
                 if re.search(userreq, elements['req']):
                     elements['userreq'] = elements['req']
@@ -67,7 +81,13 @@ if __name__ == '__main__':
                 for key in count_keys:
                     if key in elements:
                         counts[key][elements[key]] += 1
-
+    end_time = time()
+    eprint("parsed: %d matched: %d lines/s: %0.2f" % (parsed_lines,
+                                                      matched_lines -
+                                                      skipped_lines,
+                                                      float(parsed_lines) /
+           (end_time -
+            start_time)))
     output = OrderedDict()
     counters = {}
     for key in count_keys:
