@@ -19,6 +19,20 @@
         font-size: 12px;
     }
     #page { padding: 2%}
+    h2 {
+    border-bottom: 2px solid #ba478f;
+    color: #eb743b;
+    margin: 0;
+    padding: 5px 0;
+    margin-bottom: 0.5em;
+    }
+    hr {
+    margin-top: 0.5em;
+    margin-bottom: 2em;
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+    }
     </style>
   </head>
   <body>
@@ -29,10 +43,19 @@
         $.each(data, function (name, tops) {
           var title = name;
           var id = $.escapeSelector(title.replace(/\s/g, ''));
-          $('<h2 id="' + id + '_h2">').text(title + ' (total: ' + tops.total + ')').appendTo('#page');
+          $('<h2 id="' + id + '_h2">').text(title).appendTo('#page');
 
+          var paging = (tops.records.length > 10);
+          var lengthMenu = [-1];
+          var lengthChange = false;
+          if (tops.topn > 10) {
+            lengthMenu = [10, tops.topn];
+            lengthChange = true;
+          }
           $('<table id="' + id + '" class="display cell-border compact">').appendTo('#page').DataTable({
-            lengthMenu: [10, tops.topn],
+            lengthMenu: lengthMenu,
+            lengthChange: lengthChange,
+            paging: paging,
             order: [[ 2, 'desc' ], [1, 'desc']],
             data: tops.records,
             columns: [
@@ -41,6 +64,7 @@
               {data: 'percent', title: '%', type: 'num', className: "dt-right"},
             ],
           });
+          $('<div class="tablefoot">Matched hits: ' + tops.total + '</div><hr />').appendTo('#page');
         });
       });
     </script>
