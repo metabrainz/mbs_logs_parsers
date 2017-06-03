@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>MB Website Top Stuff</title>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous">
+    </script>
+    <script
+      src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js">
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css"
+      crossorigin="anonymous">
+    <style type="text/css">
+    body {
+        font-family: "Bitstream Vera Sans",Verdana,Arial,sans-serif;
+        font-size: 12px;
+    }
+    #page { padding: 2%}
+    </style>
+  </head>
+  <body>
+    <h1>MB Website Top Stuff</h1>
+    <div id="page">
+    <script>
+      $.get('https://musicbrainz.org/tops/mb_website.json', function (data) {
+        $.each(data, function (name, tops) {
+          var title = name;
+          var id = $.escapeSelector(title.replace(/\s/g, ''));
+          $('<h2 id="' + id + '_h2">').text(title + ' (total: ' + tops.total + ')').appendTo('#page');
+
+          $('<table id="' + id + '" class="display cell-border compact">').appendTo('#page').DataTable({
+            lengthMenu: [10, tops.topn],
+            order: [[ 2, 'desc' ], [1, 'desc']],
+            data: tops.records,
+            columns: [
+              {data: 'key', title: 'Key', type: 'string'},
+              {data: 'value', title: 'Value', type: 'num', className: "dt-right"},
+              {data: 'percent', title: '%', type: 'num', className: "dt-right"},
+            ],
+          });
+        });
+      });
+    </script>
+  </div>
+  </body>
+</html>
