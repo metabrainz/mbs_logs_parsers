@@ -67,7 +67,8 @@ if __name__ == '__main__':
                     skipped_lines += 1
                     continue
                 if re.search(userreq, elements['req']):
-                    elements['userreq'] = elements['req']
+                    if elements['status'] == '200':
+                        elements['userreq'] = elements['req']
                 else:
                     m = re.search(entityreq, elements['req'])
                     if m:
