@@ -47,6 +47,7 @@
       dataType: "json",
       success: function (data) {
         $.each(data, function (name, tops) {
+          if (/^_/.test(name)) return;
           var title = name;
           var id = $.escapeSelector(title.replace(/\s/g, ''));
           $('<h2 id="' + id + '_h2">').text(title).appendTo('#page');
