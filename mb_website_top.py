@@ -5,7 +5,7 @@ import fileinput
 import re
 import sys
 from collections import defaultdict, Counter, OrderedDict
-from time import time
+from time import (time, gmtime, strftime)
 
 if __name__ == '__main__':
     pat = re.compile(r'\S+ '
@@ -83,13 +83,21 @@ if __name__ == '__main__':
                     if key in elements:
                         counts[key][elements[key]] += 1
     end_time = time()
+    matched = matched_lines - skipped_lines
+    duration = end_time - start_time
+    lines_per_sec = float(parsed_lines) / duration
     eprint("parsed: %d matched: %d lines/s: %0.2f" % (parsed_lines,
-                                                      matched_lines -
-                                                      skipped_lines,
-                                                      float(parsed_lines) /
-           (end_time -
-            start_time)))
+                                                      matched,
+                                                      lines_per_sec))
     output = OrderedDict()
+    output['_stats'] = {
+        'parsed': parsed_lines,
+        'matched': matched,
+        'duration': "%0.1f" % duration,
+        'lines/s': "%0.1f" % lines_per_sec,
+        'started': strftime("%a, %d %b %Y %H:%M:%S +0000",
+                                     gmtime(start_time))
+    }
     counters = {}
     for key in count_keys:
         counters[key] = Counter(counts[key])
@@ -104,4 +112,5 @@ if __name__ == '__main__':
                 'value': int(v),
                 'percent': round(100 * v / float(total), 2)
             })
+
     print(json.dumps(output, indent=4, separators=(',', ': ')))
