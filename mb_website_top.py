@@ -19,7 +19,7 @@ if __name__ == '__main__':
                      )
 
     skipreq = re.compile(
-        r'/(?:(?:favicon.ico$)|(?:ws|search|static)[/?])'
+        r'/(?:(?:favicon.ico$)|(?:ws)[/?])'
     )
 
     userreq = re.compile(
